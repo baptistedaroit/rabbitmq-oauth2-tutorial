@@ -1,0 +1,30 @@
+name: Publish Image
+
+on:
+  push:
+    branches: build-images
+
+env:
+  UAA_VERSION: 75.19.0
+  DOCKER_IMAGE: pivotalrabbitmq/uaa
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      # - name: Login to DockerHub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./uaa-latest
+          file: ./uaa-latest/Dockerfile
+          build-args: UAA_VERSION=${UAA_VERSION}
+          push: false
+          tags: ${DOCKER_IMAGE}:${UAA_VERSION},${DOCKER_IMAGE}:dev
